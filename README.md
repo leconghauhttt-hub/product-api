@@ -23,3 +23,36 @@ API chạy tại `http://localhost:3000`. Kiểm tra kết nối tại `/health`
 | DELETE | `/api/products/:pid` | Xóa sản phẩm |
 
 Sản phẩm có các trường: `pid`, `pname`, `price`, `quantity`.
+
+
+## Chạy bằng Docker
+
+Cần có Docker Desktop và container MongoDB tên `nammongodb` từ bước trước.
+
+```bash
+docker start nammongodb
+docker network create product-net
+docker network connect product-net nammongodb
+```
+
+Tạo tệp `.env.docker` trong thư mục dự án:
+
+```env
+PORT=3000
+MONGODB_URI=mongodb://nammongodb:27017/productdb
+```
+
+Build và chạy API:
+
+```bash
+docker build -t product-api:local .
+docker run -d --name product-api --network product-net --env-file .env.docker -p 127.0.0.1:3000:3000 product-api:local
+```
+Các lệnh tạo mạng, nối mạng và `docker run` chỉ dùng lần đầu. Những lần sau, chạy `docker start nammongodb product-api`.
+
+Kiểm tra:
+
+```bash
+curl -i http://localhost:3000/health
+curl -i http://localhost:3000/api/products
+```
