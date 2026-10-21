@@ -40,7 +40,7 @@ async function waitForApi() {
 async function main() {
   await waitForApi();
 
-  const pid = 1001;
+  const pid = Date.now();
   const path = `/api/products/${pid}`;
 
   let result = await request('POST', '/api/products', {
@@ -56,6 +56,7 @@ async function main() {
   result = await request('GET', path);
   assert.equal(result.status, 200, JSON.stringify(result.data));
   assert.equal(result.data.pname, 'CI Product');
+  assert.equal(result.data.price, 100);
   console.log('READ theo pid: đạt');
 
   result = await request('GET', '/api/products');
