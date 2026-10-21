@@ -56,3 +56,22 @@ Kiểm tra:
 curl -i http://localhost:3000/health
 curl -i http://localhost:3000/api/products
 ```
+
+## Chạy bằng Docker Compose
+
+Tạo `.env.docker` theo nội dung ở phần trên. Compose sẽ chạy MongoDB riêng và mở API tại cổng 3001.
+
+```bash
+docker compose up -d --build
+docker compose ps
+curl -i http://localhost:3001/health
+curl -i http://localhost:3001/api/products
+```
+
+Dừng hai dịch vụ khi cần:
+
+```bash
+docker compose down
+```
+
+Lệnh `down` ở trên giữ lại volume dữ liệu MongoDB.
