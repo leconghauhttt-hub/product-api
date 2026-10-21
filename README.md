@@ -62,11 +62,12 @@ curl -i http://localhost:3000/api/products
 Tạo `.env.docker` theo nội dung ở phần trên. Compose sẽ chạy MongoDB riêng và mở API tại cổng 3001.
 
 ```bash
-docker compose up -d --build
+docker compose up -d --build --wait --wait-timeout 120
 docker compose ps
 curl -i http://localhost:3001/health
 curl -i http://localhost:3001/api/products
 ```
+`docker compose ps` cần hiển thị `(healthy)` ở cả `api` và `nammongodb`. API chỉ khởi động sau khi MongoDB vượt qua healthcheck.
 
 Dừng hai dịch vụ khi cần:
 
