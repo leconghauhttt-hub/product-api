@@ -1,0 +1,34 @@
+name: product-api-prod
+
+services:
+  nammongodb:
+    image: mongo:8.0-noble
+    volumes:
+      - mongodb_prod_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "exit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api:
+    image: hauleis/product-api:latest
+    pull_policy: always
+    env_file:
+      - .env.docker
+    ports:
+      - "127.0.0.1:3002:3000"
+    depends_on:
+      nammongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: on-failure
+
+volumes:
+  mongodb_prod_data:
