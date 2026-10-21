@@ -1,0 +1,54 @@
+name: Product API CI CRUD với MongoDB
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  crud-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    services:
+      mongodb:
+        image: mongo:8.0-noble
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'exit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)'"
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 5
+          --health-start-period 30s
+
+    env:
+      PORT: '3000'
+      MONGODB_URI: mongodb://127.0.0.1:27017/productdb
+
+    steps:
+      - name: Lấy mã nguồn
+        uses: actions/checkout@v6
+
+      - name: Cài Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Cài thư viện
+        run: npm ci
+
+      - name: Khởi động Product API
+        run: |
+          node server.js > api.log 2>&1 &
+          echo $! > api.pid
+
+      - name: Kiểm tra health và CRUD
+        run: node tests/ci-crud.js
+
+      - name: Hiển thị log API nếu lỗi
+        if: failure()
+        run: cat api.log || true
