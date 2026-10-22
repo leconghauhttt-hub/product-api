@@ -56,7 +56,7 @@ async function main() {
   result = await request('GET', path);
   assert.equal(result.status, 200, JSON.stringify(result.data));
   assert.equal(result.data.pname, 'CI Product');
-  assert.equal(result.data.price, 100);
+  assert.equal(result.data.price, 10000);
   console.log('READ theo pid: đạt');
 
   result = await request('GET', '/api/products');
